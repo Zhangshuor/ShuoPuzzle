@@ -12,12 +12,15 @@ import java.util.ArrayList;
 import java.util.Random;
 
 public class GameJFrame extends JFrame implements KeyListener, ActionListener {
+    private static final String CATEGORY_ANIMAL = "animal";
+    private static final String CATEGORY_GIRL = "girl";
+    private static final String CATEGORY_SPORT = "sport";
     //创建二维数组：用来管理数据，加兹安图片时会根据二维数组数据进行加载
     int[][] data = new int[4][4];
     //空白方块在二维数组中的位置
     int x;
     int y;
-    String path = "image/animal/animal3/";
+    String path = getPicFolder(CATEGORY_ANIMAL);
     //统计步数
     int step;
 
@@ -276,19 +279,19 @@ public class GameJFrame extends JFrame implements KeyListener, ActionListener {
                 ex.printStackTrace();
             }
         }else if (source == girlItem) {
-            path = getPicFolder("girl");
+            path = getPicFolder(CATEGORY_GIRL);
             step = 0;
             initData();
             initImage();
 
         }else if (source == animalItem) {
-            path = getPicFolder("animal");
+            path = getPicFolder(CATEGORY_ANIMAL);
             step = 0;
             initData();
             initImage();
 
         }else if (source == sportItem) {
-            path = getPicFolder("sport");
+            path = getPicFolder(CATEGORY_SPORT);
             step = 0;
             initData();
             initImage();
