@@ -1,6 +1,7 @@
 package com.suresure.ui;
 
 import javax.swing.*;
+import javax.swing.border.BevelBorder;
 import java.util.Random;
 
 public class GameJFrame extends JFrame {
@@ -45,11 +46,17 @@ public class GameJFrame extends JFrame {
         for (int i = 0; i < 4; i++) {
             for (int j = 0; j < 4; j++) {
                 JLabel jLabel = new JLabel(new ImageIcon("image/animal/animal3/" + data[i][j] + ".jpg"));
-                jLabel.setBounds(j * 105, i * 105, 105, 105);
+                jLabel.setBounds(j * 105 + 83, i * 105 + 134, 105, 105);
+                //给图片设置边框
+                jLabel.setBorder(new BevelBorder(BevelBorder.LOWERED));
                 this.getContentPane().add(jLabel);
                 num++;
             }
         }
+        JLabel background = new JLabel(new ImageIcon("image/background.png"));
+        background.setBounds(40,40,508,560);
+        //把背景图片添加到界面当中
+        this.getContentPane().add(background);
     }
 
     private void initJMenuBar() {
