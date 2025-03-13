@@ -2,11 +2,14 @@ package com.suresure.ui;
 
 import javax.swing.*;
 import javax.swing.border.BevelBorder;
+import java.awt.*;
+import java.awt.event.ActionEvent;
+import java.awt.event.ActionListener;
 import java.awt.event.KeyEvent;
 import java.awt.event.KeyListener;
 import java.util.Random;
 
-public class GameJFrame extends JFrame implements KeyListener {
+public class GameJFrame extends JFrame implements KeyListener, ActionListener {
     //创建二维数组：用来管理数据，加兹安图片时会根据二维数组数据进行加载
     int[][] data = new int[4][4];
     //空白方块在二维数组中的位置
@@ -22,6 +25,10 @@ public class GameJFrame extends JFrame implements KeyListener {
             {9,10,11,12},
             {13,14,15,16}
     };
+    JMenuItem replayItem = new JMenuItem("重新游戏");
+    JMenuItem reLoginItem = new JMenuItem("重新登陆");
+    JMenuItem closeItem = new JMenuItem("关闭游戏");
+    JMenuItem myGitHubItem = new JMenuItem("我的GitHub");
 
     public GameJFrame() {
         //初始化界面
@@ -99,15 +106,17 @@ public class GameJFrame extends JFrame implements KeyListener {
         JMenu functionJMenu = new JMenu("功能");
         JMenu aboutJMenu = new JMenu("关于我们");
         //创建选项下面的条目对象
-        JMenuItem replayItem = new JMenuItem("重新游戏");
-        JMenuItem reLoginItem = new JMenuItem("重新登陆");
-        JMenuItem closeItem = new JMenuItem("关闭游戏");
-        JMenuItem myGitHubItem = new JMenuItem("我的GitHub");
+
         //将每一个选项下面的条目添加到选项下面
         functionJMenu.add(replayItem);
         functionJMenu.add(reLoginItem);
         functionJMenu.add(closeItem);
         aboutJMenu.add(myGitHubItem);
+        //给条目绑定事件
+        replayItem.addActionListener(this);
+        reLoginItem.addActionListener(this);
+        closeItem.addActionListener(this);
+        myGitHubItem.addActionListener(this);
 
         //将菜单里面的两个选项添加到菜单里面
         jMenuBar.add(functionJMenu);
@@ -227,5 +236,32 @@ public class GameJFrame extends JFrame implements KeyListener {
             }
         }
         return true;
+    }
+
+    @Override
+    public void actionPerformed(ActionEvent e) {
+        Object source = e.getSource();
+        if (source == replayItem) {
+            // 重新游戏：重新初始化数据并刷新界面
+            step = 0;
+            initData();
+            initImage();
+        } else if (source == reLoginItem) {
+            // 重新登陆：这里只做提示，可根据需要实现登陆逻辑
+            JOptionPane.showMessageDialog(this, "你确定要重新登陆吗？重新登录后游戏进度将不被保存");
+            this.setVisible(false);
+            new LoginJFrame();
+        } else if (source == closeItem) {
+            // 关闭游戏
+            JOptionPane.showMessageDialog(this, "你确定要关闭游戏吗？关闭游戏后游戏进度将不被保存");
+            System.exit(0);
+        } else if (source == myGitHubItem) {
+            // 打开 GitHub 链接
+            try {
+                Desktop.getDesktop().browse(new java.net.URI("https://github.com/Zhangshuor"));
+            } catch (Exception ex) {
+                ex.printStackTrace();
+            }
+        }
     }
 }
