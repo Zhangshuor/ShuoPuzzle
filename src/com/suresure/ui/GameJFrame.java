@@ -14,6 +14,13 @@ public class GameJFrame extends JFrame implements KeyListener {
     int y;
     String path = "image/animal/animal3/";
 
+    int[][] win = {
+            {1,2,3,4},
+            {5,6,7,8},
+            {9,10,11,12},
+            {13,14,15,16}
+    };
+
     public GameJFrame() {
         //初始化界面
         initJFrame();
@@ -54,6 +61,12 @@ public class GameJFrame extends JFrame implements KeyListener {
     private void initImage() {
         //清空原本的所有图片
         this.getContentPane().removeAll();
+        if (victory()){
+            JLabel winJLabel = new JLabel(new ImageIcon("image/win.png"));
+            winJLabel.setBounds(203,283,197,73);
+            this.getContentPane().add(winJLabel);
+            this.getContentPane().repaint();
+        }
         int num = 1;
         for (int i = 0; i < 4; i++) {
             for (int j = 0; j < 4; j++) {
@@ -138,6 +151,11 @@ public class GameJFrame extends JFrame implements KeyListener {
 
     @Override
     public void keyReleased(KeyEvent e) {
+        //如果胜利了，此方法直接结束，不能再执行下面移动的代码了
+        if (victory()){
+            return;
+        }
+
         //左 37 上 38 右 39 下 40
         int keyCode = e.getKeyCode();
         if (keyCode == KeyEvent.VK_LEFT) {
@@ -188,5 +206,16 @@ public class GameJFrame extends JFrame implements KeyListener {
             };
             initImage();
         }
+    }
+
+    public boolean victory(){
+        for (int i = 0; i < data.length; i++) {
+            for (int j = 0; j < data[i].length; j++) {
+                if (data[i][j] != win[i][j]) {
+                    return false;
+                }
+            }
+        }
+        return true;
     }
 }
