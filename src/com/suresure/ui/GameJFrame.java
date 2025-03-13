@@ -2,11 +2,18 @@ package com.suresure.ui;
 
 import javax.swing.*;
 import javax.swing.border.BevelBorder;
+import java.awt.event.KeyEvent;
+import java.awt.event.KeyListener;
+import java.awt.event.MouseListener;
+import java.awt.event.MouseMotionListener;
 import java.util.Random;
 
-public class GameJFrame extends JFrame {
+public class GameJFrame extends JFrame implements KeyListener {
     //创建二维数组：用来管理数据，加兹安图片时会根据二维数组数据进行加载
     int[][] data = new int[4][4];
+    //空白方块在二维数组中的位置
+    int x;
+    int y;
 
     public GameJFrame() {
         //初始化界面
@@ -34,6 +41,10 @@ public class GameJFrame extends JFrame {
         int index = 0;
         for (int i = 0; i < 4; i++) {
             for (int j = 0; j < 4; j++) {
+                if (tempArr[index] == 0) {
+                    x = i;
+                    y = j;
+                }
                 data[i][j] = tempArr[index];
                 index++;
             }
@@ -42,6 +53,8 @@ public class GameJFrame extends JFrame {
 
     //初始化图片
     private void initImage() {
+        //清空原本的所有图片
+        this.getContentPane().removeAll();
         int num = 1;
         for (int i = 0; i < 4; i++) {
             for (int j = 0; j < 4; j++) {
@@ -54,9 +67,11 @@ public class GameJFrame extends JFrame {
             }
         }
         JLabel background = new JLabel(new ImageIcon("image/background.png"));
-        background.setBounds(40,40,508,560);
+        background.setBounds(40, 40, 508, 560);
         //把背景图片添加到界面当中
         this.getContentPane().add(background);
+        //刷新界面
+        this.getContentPane().repaint();
     }
 
     private void initJMenuBar() {
@@ -97,5 +112,61 @@ public class GameJFrame extends JFrame {
         this.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
         //取消默认的居中防止
         this.setLayout(null);
+        //给整个界面添加键盘监听事件
+        this.addKeyListener(this);
+    }
+
+    @Override
+    public void keyTyped(KeyEvent e) {
+
+    }
+
+    @Override
+    public void keyPressed(KeyEvent e) {
+
+    }
+
+    @Override
+    public void keyReleased(KeyEvent e) {
+        //左 37 上 38 右 39 下 40
+        int keyCode = e.getKeyCode();
+        if (keyCode == KeyEvent.VK_LEFT) {
+            if (y < data[y].length - 1) {
+                //空白块下方的数字往上移动
+                data[x][y] = data[x][y + 1];
+                data[x][y + 1] = 0;
+                y++;
+                //调用方法，按最新数字加载图片
+                initImage();
+            }
+        } else if (keyCode == KeyEvent.VK_UP) {
+            if (x < data[x].length - 1) {
+                //空白块下方的数字往上移动
+                data[x][y] = data[x + 1][y];
+                data[x + 1][y] = 0;
+                x++;
+                //调用方法，按最新数字加载图片
+                initImage();
+            }
+        } else if (keyCode == KeyEvent.VK_RIGHT) {
+            if (y > 0) {
+                //空白块上方的数字往下移动
+                data[x][y] = data[x][y - 1];
+                data[x][y - 1] = 0;
+                y--;
+                //调用方法，按最新数字加载图片
+                initImage();
+            }
+
+        } else if (keyCode == KeyEvent.VK_DOWN) {
+            if (x > 0) {
+                //空白块上方的数字往下移动
+                data[x][y] = data[x - 1][y];
+                data[x - 1][y] = 0;
+                x--;
+                //调用方法，按最新数字加载图片
+                initImage();
+            }
+        }
     }
 }
