@@ -1,18 +1,42 @@
 package com.suresure.ui;
 
 import javax.swing.*;
-import java.awt.*;
+import java.util.Random;
 
 public class GameJFrame extends JFrame {
+    //创建二维数组：用来管理数据，加兹安图片时会根据二维数组数据进行加载
+    int[][] data = new int[4][4];
+
     public GameJFrame() {
         //初始化界面
         initJFrame();
         //初始化菜单
         initJMenuBar();
+        //初始化数据
+        initData();
         //初始化图片
         initImage();
         //让界面显示出来
         this.setVisible(true);
+    }
+
+    //初始化数据
+    private void initData() {
+        int[] tempArr = {0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15};
+        Random r = new Random();
+        for (int i = 0; i < tempArr.length; i++) {
+            int index = r.nextInt(tempArr.length);
+            int temp = tempArr[i];
+            tempArr[i] = tempArr[index];
+            tempArr[index] = temp;
+        }
+        int index = 0;
+        for (int i = 0; i < 4; i++) {
+            for (int j = 0; j < 4; j++) {
+                data[i][j] = tempArr[index];
+                index++;
+            }
+        }
     }
 
     //初始化图片
@@ -20,7 +44,7 @@ public class GameJFrame extends JFrame {
         int num = 1;
         for (int i = 0; i < 4; i++) {
             for (int j = 0; j < 4; j++) {
-                JLabel jLabel = new JLabel(new ImageIcon("image/animal/animal3/"+num+".jpg"));
+                JLabel jLabel = new JLabel(new ImageIcon("image/animal/animal3/" + data[i][j] + ".jpg"));
                 jLabel.setBounds(j * 105, i * 105, 105, 105);
                 this.getContentPane().add(jLabel);
                 num++;
