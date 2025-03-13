@@ -13,6 +13,8 @@ public class GameJFrame extends JFrame implements KeyListener {
     int x;
     int y;
     String path = "image/animal/animal3/";
+    //统计步数
+    int step;
 
     int[][] win = {
             {1,2,3,4},
@@ -67,6 +69,10 @@ public class GameJFrame extends JFrame implements KeyListener {
             this.getContentPane().add(winJLabel);
             this.getContentPane().repaint();
         }
+        JLabel stepCount = new JLabel("步数: " + step);
+        stepCount.setBounds(50,30,100,20);
+        this.getContentPane().add(stepCount);
+        this.getContentPane().repaint();
         int num = 1;
         for (int i = 0; i < 4; i++) {
             for (int j = 0; j < 4; j++) {
@@ -166,6 +172,7 @@ public class GameJFrame extends JFrame implements KeyListener {
                 y++;
                 //调用方法，按最新数字加载图片
                 initImage();
+                step++;
             }
         } else if (keyCode == KeyEvent.VK_UP) {
             if (x < data[x].length - 1) {
@@ -175,6 +182,7 @@ public class GameJFrame extends JFrame implements KeyListener {
                 x++;
                 //调用方法，按最新数字加载图片
                 initImage();
+                step++;
             }
         } else if (keyCode == KeyEvent.VK_RIGHT) {
             if (y > 0) {
@@ -184,6 +192,7 @@ public class GameJFrame extends JFrame implements KeyListener {
                 y--;
                 //调用方法，按最新数字加载图片
                 initImage();
+                step++;
             }
 
         } else if (keyCode == KeyEvent.VK_DOWN) {
@@ -194,6 +203,7 @@ public class GameJFrame extends JFrame implements KeyListener {
                 x--;
                 //调用方法，按最新数字加载图片
                 initImage();
+                step++;
             }
         } else if (keyCode == KeyEvent.VK_V) {
             initImage();
