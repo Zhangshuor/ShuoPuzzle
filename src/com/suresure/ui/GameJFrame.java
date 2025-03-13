@@ -4,8 +4,6 @@ import javax.swing.*;
 import javax.swing.border.BevelBorder;
 import java.awt.event.KeyEvent;
 import java.awt.event.KeyListener;
-import java.awt.event.MouseListener;
-import java.awt.event.MouseMotionListener;
 import java.util.Random;
 
 public class GameJFrame extends JFrame implements KeyListener {
@@ -123,7 +121,18 @@ public class GameJFrame extends JFrame implements KeyListener {
 
     @Override
     public void keyPressed(KeyEvent e) {
-
+        if (e.getKeyCode() == KeyEvent.VK_V) {
+            this.getContentPane().removeAll();
+            JLabel all = new JLabel(new ImageIcon("image/animal/animal3/all.jpg"));
+            all.setBounds(83, 134, 420, 420);
+            this.getContentPane().add(all);
+            JLabel background = new JLabel(new ImageIcon("image/background.png"));
+            background.setBounds(40, 40, 508, 560);
+            //把背景图片添加到界面当中
+            this.getContentPane().add(background);
+            //刷新界面
+            this.getContentPane().repaint();
+        }
     }
 
     @Override
@@ -167,6 +176,8 @@ public class GameJFrame extends JFrame implements KeyListener {
                 //调用方法，按最新数字加载图片
                 initImage();
             }
+        } else if (keyCode == KeyEvent.VK_V) {
+            initImage();
         }
     }
 }
