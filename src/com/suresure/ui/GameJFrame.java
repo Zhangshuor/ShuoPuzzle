@@ -12,6 +12,7 @@ public class GameJFrame extends JFrame implements KeyListener {
     //空白方块在二维数组中的位置
     int x;
     int y;
+    String path = "image/animal/animal3/";
 
     public GameJFrame() {
         //初始化界面
@@ -56,7 +57,7 @@ public class GameJFrame extends JFrame implements KeyListener {
         int num = 1;
         for (int i = 0; i < 4; i++) {
             for (int j = 0; j < 4; j++) {
-                JLabel jLabel = new JLabel(new ImageIcon("image/animal/animal3/" + data[i][j] + ".jpg"));
+                JLabel jLabel = new JLabel(new ImageIcon(path + data[i][j] + ".jpg"));
                 jLabel.setBounds(j * 105 + 83, i * 105 + 134, 105, 105);
                 //给图片设置边框
                 jLabel.setBorder(new BevelBorder(BevelBorder.LOWERED));
@@ -123,7 +124,7 @@ public class GameJFrame extends JFrame implements KeyListener {
     public void keyPressed(KeyEvent e) {
         if (e.getKeyCode() == KeyEvent.VK_V) {
             this.getContentPane().removeAll();
-            JLabel all = new JLabel(new ImageIcon("image/animal/animal3/all.jpg"));
+            JLabel all = new JLabel(new ImageIcon(path + "all.jpg"));
             all.setBounds(83, 134, 420, 420);
             this.getContentPane().add(all);
             JLabel background = new JLabel(new ImageIcon("image/background.png"));
@@ -177,6 +178,14 @@ public class GameJFrame extends JFrame implements KeyListener {
                 initImage();
             }
         } else if (keyCode == KeyEvent.VK_V) {
+            initImage();
+        } else if (keyCode == KeyEvent.VK_W) {
+            data = new int[][]{
+                    {1,2,3,4},
+                    {5,6,7,8},
+                    {9,10,11,12},
+                    {13,14,15,16}
+            };
             initImage();
         }
     }
