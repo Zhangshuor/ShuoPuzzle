@@ -7,6 +7,8 @@ import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.awt.event.KeyEvent;
 import java.awt.event.KeyListener;
+import java.io.File;
+import java.util.ArrayList;
 import java.util.Random;
 
 public class GameJFrame extends JFrame implements KeyListener, ActionListener {
@@ -20,11 +22,17 @@ public class GameJFrame extends JFrame implements KeyListener, ActionListener {
     int step;
 
     int[][] win = {
-            {1,2,3,4},
-            {5,6,7,8},
-            {9,10,11,12},
-            {13,14,15,16}
+            {1, 2, 3, 4},
+            {5, 6, 7, 8},
+            {9, 10, 11, 12},
+            {13, 14, 15, 0}
     };
+    JMenu functionJMenu = new JMenu("功能");
+    JMenu aboutJMenu = new JMenu("关于我们");
+    JMenu changePictureMenu = new JMenu("更换图片");
+    JMenuItem girlItem = new JMenuItem("美女");
+    JMenuItem animalItem = new JMenuItem("动物");
+    JMenuItem sportItem = new JMenuItem("运动");
     JMenuItem replayItem = new JMenuItem("重新游戏");
     JMenuItem reLoginItem = new JMenuItem("重新登陆");
     JMenuItem closeItem = new JMenuItem("关闭游戏");
@@ -70,14 +78,14 @@ public class GameJFrame extends JFrame implements KeyListener, ActionListener {
     private void initImage() {
         //清空原本的所有图片
         this.getContentPane().removeAll();
-        if (victory()){
+        if (victory()) {
             JLabel winJLabel = new JLabel(new ImageIcon("image/win.png"));
-            winJLabel.setBounds(203,283,197,73);
+            winJLabel.setBounds(203, 283, 197, 73);
             this.getContentPane().add(winJLabel);
             this.getContentPane().repaint();
         }
         JLabel stepCount = new JLabel("步数: " + step);
-        stepCount.setBounds(50,30,100,20);
+        stepCount.setBounds(50, 30, 100, 20);
         this.getContentPane().add(stepCount);
         this.getContentPane().repaint();
         int num = 1;
@@ -103,20 +111,25 @@ public class GameJFrame extends JFrame implements KeyListener, ActionListener {
         //创建整个菜单对象
         JMenuBar jMenuBar = new JMenuBar();
         //创建菜单上面的两个选项对象 （功能 关于我们）
-        JMenu functionJMenu = new JMenu("功能");
-        JMenu aboutJMenu = new JMenu("关于我们");
-        //创建选项下面的条目对象
+
 
         //将每一个选项下面的条目添加到选项下面
+        functionJMenu.add(changePictureMenu);
         functionJMenu.add(replayItem);
         functionJMenu.add(reLoginItem);
         functionJMenu.add(closeItem);
         aboutJMenu.add(myGitHubItem);
+        changePictureMenu.add(girlItem);
+        changePictureMenu.add(animalItem);
+        changePictureMenu.add(sportItem);
         //给条目绑定事件
         replayItem.addActionListener(this);
         reLoginItem.addActionListener(this);
         closeItem.addActionListener(this);
         myGitHubItem.addActionListener(this);
+        girlItem.addActionListener(this);
+        animalItem.addActionListener(this);
+        sportItem.addActionListener(this);
 
         //将菜单里面的两个选项添加到菜单里面
         jMenuBar.add(functionJMenu);
@@ -167,7 +180,7 @@ public class GameJFrame extends JFrame implements KeyListener, ActionListener {
     @Override
     public void keyReleased(KeyEvent e) {
         //如果胜利了，此方法直接结束，不能再执行下面移动的代码了
-        if (victory()){
+        if (victory()) {
             return;
         }
 
@@ -218,16 +231,16 @@ public class GameJFrame extends JFrame implements KeyListener, ActionListener {
             initImage();
         } else if (keyCode == KeyEvent.VK_W) {
             data = new int[][]{
-                    {1,2,3,4},
-                    {5,6,7,8},
-                    {9,10,11,12},
-                    {13,14,15,16}
+                    {1, 2, 3, 4},
+                    {5, 6, 7, 8},
+                    {9, 10, 11, 12},
+                    {13, 14, 15, 0}
             };
             initImage();
         }
     }
 
-    public boolean victory(){
+    public boolean victory() {
         for (int i = 0; i < data.length; i++) {
             for (int j = 0; j < data[i].length; j++) {
                 if (data[i][j] != win[i][j]) {
@@ -262,6 +275,59 @@ public class GameJFrame extends JFrame implements KeyListener, ActionListener {
             } catch (Exception ex) {
                 ex.printStackTrace();
             }
+        }else if (source == girlItem) {
+            path = getPicFolder("girl");
+            step = 0;
+            initData();
+            initImage();
+
+        }else if (source == animalItem) {
+            path = getPicFolder("animal");
+            step = 0;
+            initData();
+            initImage();
+
+        }else if (source == sportItem) {
+            path = getPicFolder("sport");
+            step = 0;
+            initData();
+            initImage();
         }
+    }
+
+    private String getPicFolder(String category) {
+        String rootPath = "image/" + category + "/";
+        File folder = new File(rootPath);
+
+        // 检查目录是否存在且有效
+        if (!folder.exists() || !folder.isDirectory()) {
+            return null;
+        }
+
+        // 获取所有子项（仅遍历一层）
+        File[] files = folder.listFiles();
+        if (files == null) {
+            return null;
+        }
+
+        // 筛选出子文件夹
+        ArrayList<Object> subDirs = new ArrayList<>();
+        for (File file : files) {
+            if (file.isDirectory()) {
+                subDirs.add(file);
+            }
+        }
+
+        // 若无子文件夹则返回null
+        if (subDirs.isEmpty()) {
+            return null;
+        }
+
+        // 随机选择一个子文件夹
+        Random random = new Random();
+        File selectedDir = (File) subDirs.get(random.nextInt(subDirs.size()));
+
+        // 拼接路径并返回（确保末尾带斜杠）
+        return rootPath + selectedDir.getName() + "/";
     }
 }
