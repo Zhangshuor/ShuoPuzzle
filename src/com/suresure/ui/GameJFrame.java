@@ -1,6 +1,7 @@
 package com.suresure.ui;
 
 import javax.swing.*;
+import java.awt.*;
 
 public class GameJFrame extends JFrame {
     public GameJFrame() {
@@ -8,8 +9,23 @@ public class GameJFrame extends JFrame {
         initJFrame();
         //初始化菜单
         initJMenuBar();
+        //初始化图片
+        initImage();
         //让界面显示出来
         this.setVisible(true);
+    }
+
+    //初始化图片
+    private void initImage() {
+        int num = 1;
+        for (int i = 0; i < 4; i++) {
+            for (int j = 0; j < 4; j++) {
+                JLabel jLabel = new JLabel(new ImageIcon("image/animal/animal3/"+num+".jpg"));
+                jLabel.setBounds(j * 105, i * 105, 105, 105);
+                this.getContentPane().add(jLabel);
+                num++;
+            }
+        }
     }
 
     private void initJMenuBar() {
@@ -39,7 +55,7 @@ public class GameJFrame extends JFrame {
 
     private void initJFrame() {
         //设置界面宽高
-        this.setSize(603,680);
+        this.setSize(603, 680);
         //设置界面标题
         this.setTitle("硕硕拼图v1.0");
         //设置界面置顶
@@ -48,5 +64,7 @@ public class GameJFrame extends JFrame {
         this.setLocationRelativeTo(null);
         //设置游戏的关闭模式
         this.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
+        //取消默认的居中防止
+        this.setLayout(null);
     }
 }
