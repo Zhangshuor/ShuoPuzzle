@@ -187,6 +187,10 @@ public class LoginJFrame extends JFrame implements MouseListener {
             }
         } else if (e.getSource() == register) {
             System.out.println("点击了注册按钮");
+            //关闭当前登录页面
+            this.setVisible(false);
+            //打开注册页面
+            new RegisterJFrame(allUsers);
         } else if (e.getSource() == rightCode) {
             System.out.println("更换验证码");
             //获取一个新的验证码
