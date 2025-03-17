@@ -1,5 +1,8 @@
 package com.suresure.ui;
 
+import cn.hutool.core.io.IoUtil;
+import com.suresure.domain.GameInfo;
+
 import javax.swing.*;
 import javax.swing.border.BevelBorder;
 import java.awt.*;
@@ -8,6 +11,9 @@ import java.awt.event.ActionListener;
 import java.awt.event.KeyEvent;
 import java.awt.event.KeyListener;
 import java.io.File;
+import java.io.FileOutputStream;
+import java.io.IOException;
+import java.io.ObjectOutputStream;
 import java.util.ArrayList;
 import java.util.Random;
 
@@ -24,12 +30,7 @@ public class GameJFrame extends JFrame implements KeyListener, ActionListener {
     //统计步数
     int step;
 
-    int[][] win = {
-            {1, 2, 3, 4},
-            {5, 6, 7, 8},
-            {9, 10, 11, 12},
-            {13, 14, 15, 0}
-    };
+    int[][] win = {{1, 2, 3, 4}, {5, 6, 7, 8}, {9, 10, 11, 12}, {13, 14, 15, 0}};
     JMenu functionJMenu = new JMenu("功能");
     JMenu aboutJMenu = new JMenu("关于我们");
     JMenu changePictureMenu = new JMenu("更换图片");
@@ -39,6 +40,22 @@ public class GameJFrame extends JFrame implements KeyListener, ActionListener {
     JMenuItem replayItem = new JMenuItem("重新游戏");
     JMenuItem reLoginItem = new JMenuItem("重新登陆");
     JMenuItem closeItem = new JMenuItem("关闭游戏");
+
+    JMenu saveJMenu = new JMenu("存档");
+    JMenu loadJMenu = new JMenu("读档");
+
+    JMenuItem saveItem0 = new JMenuItem("存档0(空)");
+    JMenuItem saveItem1 = new JMenuItem("存档1(空)");
+    JMenuItem saveItem2 = new JMenuItem("存档2(空)");
+    JMenuItem saveItem3 = new JMenuItem("存档3(空)");
+    JMenuItem saveItem4 = new JMenuItem("存档4(空)");
+
+    JMenuItem loadItem0 = new JMenuItem("读档0(空)");
+    JMenuItem loadItem1 = new JMenuItem("读档1(空)");
+    JMenuItem loadItem2 = new JMenuItem("读档2(空)");
+    JMenuItem loadItem3 = new JMenuItem("读档3(空)");
+    JMenuItem loadItem4 = new JMenuItem("读档4(空)");
+
     JMenuItem myGitHubItem = new JMenuItem("我的GitHub");
 
     public GameJFrame() {
@@ -114,17 +131,30 @@ public class GameJFrame extends JFrame implements KeyListener, ActionListener {
         //创建整个菜单对象
         JMenuBar jMenuBar = new JMenuBar();
         //创建菜单上面的两个选项对象 （功能 关于我们）
-
-
         //将每一个选项下面的条目添加到选项下面
         functionJMenu.add(changePictureMenu);
         functionJMenu.add(replayItem);
         functionJMenu.add(reLoginItem);
         functionJMenu.add(closeItem);
+        functionJMenu.add(saveJMenu);
+        functionJMenu.add(loadJMenu);
         aboutJMenu.add(myGitHubItem);
         changePictureMenu.add(girlItem);
         changePictureMenu.add(animalItem);
         changePictureMenu.add(sportItem);
+        //把5个存档，添加到saveJMenu中
+        saveJMenu.add(saveItem0);
+        saveJMenu.add(saveItem1);
+        saveJMenu.add(saveItem2);
+        saveJMenu.add(saveItem3);
+        saveJMenu.add(saveItem4);
+
+        //把5个读档，添加到loadJMenu中
+        loadJMenu.add(loadItem0);
+        loadJMenu.add(loadItem1);
+        loadJMenu.add(loadItem2);
+        loadJMenu.add(loadItem3);
+        loadJMenu.add(loadItem4);
         //给条目绑定事件
         replayItem.addActionListener(this);
         reLoginItem.addActionListener(this);
@@ -133,6 +163,17 @@ public class GameJFrame extends JFrame implements KeyListener, ActionListener {
         girlItem.addActionListener(this);
         animalItem.addActionListener(this);
         sportItem.addActionListener(this);
+
+        saveItem0.addActionListener(this);
+        saveItem1.addActionListener(this);
+        saveItem2.addActionListener(this);
+        saveItem3.addActionListener(this);
+        saveItem4.addActionListener(this);
+        loadItem0.addActionListener(this);
+        loadItem1.addActionListener(this);
+        loadItem2.addActionListener(this);
+        loadItem3.addActionListener(this);
+        loadItem4.addActionListener(this);
 
         //将菜单里面的两个选项添加到菜单里面
         jMenuBar.add(functionJMenu);
@@ -233,12 +274,7 @@ public class GameJFrame extends JFrame implements KeyListener, ActionListener {
         } else if (keyCode == KeyEvent.VK_V) {
             initImage();
         } else if (keyCode == KeyEvent.VK_W) {
-            data = new int[][]{
-                    {1, 2, 3, 4},
-                    {5, 6, 7, 8},
-                    {9, 10, 11, 12},
-                    {13, 14, 15, 0}
-            };
+            data = new int[][]{{1, 2, 3, 4}, {5, 6, 7, 8}, {9, 10, 11, 12}, {13, 14, 15, 0}};
             initImage();
         }
     }
@@ -278,23 +314,38 @@ public class GameJFrame extends JFrame implements KeyListener, ActionListener {
             } catch (Exception ex) {
                 ex.printStackTrace();
             }
-        }else if (source == girlItem) {
+        } else if (source == girlItem) {
             path = getPicFolder(CATEGORY_GIRL);
             step = 0;
             initData();
             initImage();
 
-        }else if (source == animalItem) {
+        } else if (source == animalItem) {
             path = getPicFolder(CATEGORY_ANIMAL);
             step = 0;
             initData();
             initImage();
 
-        }else if (source == sportItem) {
+        } else if (source == sportItem) {
             path = getPicFolder(CATEGORY_SPORT);
             step = 0;
             initData();
             initImage();
+        } else if (source == saveItem0 || source == saveItem1 || source == saveItem2 || source == saveItem3 || source == saveItem4) {
+            JMenuItem item = (JMenuItem) source;
+            int index = item.getText().charAt(2) - '0';
+            try {
+                ObjectOutputStream oos = new ObjectOutputStream(new FileOutputStream("save\\save" + index + ".data"));
+                IoUtil.writeObj(oos, true, GameInfo.class);
+            } catch (IOException ex) {
+                throw new RuntimeException(ex);
+            }
+            //修改存档和读档item信息
+            item.setText("存档" + index + "(" + step + "步)");
+            loadJMenu.getItem(index).setText("存档" + index + "(" + step + "步)");
+        } else if (source == loadItem0 || source == loadItem1 || source == loadItem2 || source == loadItem3 || source == loadItem4) {
+            JMenuItem item = (JMenuItem) source;
+            System.out.println(item.getText());
         }
     }
 
