@@ -10,10 +10,7 @@ import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.awt.event.KeyEvent;
 import java.awt.event.KeyListener;
-import java.io.File;
-import java.io.FileOutputStream;
-import java.io.IOException;
-import java.io.ObjectOutputStream;
+import java.io.*;
 import java.util.ArrayList;
 import java.util.Random;
 
@@ -69,6 +66,27 @@ public class GameJFrame extends JFrame implements KeyListener, ActionListener {
         initImage();
         //让界面显示出来
         this.setVisible(true);
+    }
+
+    public void getGameInfo() {
+        File file = new File("save");
+        File[] files = file.listFiles();
+        if (files != null) {
+            for (File f : files) {
+                GameInfo gi = null;
+                try {
+                    ObjectInputStream ois = new ObjectInputStream(new FileInputStream(f));
+                    gi = (GameInfo) ois.readObject();
+                    ois.close();
+                } catch (IOException | ClassNotFoundException e) {
+                    throw new RuntimeException(e);
+                }
+                int step = gi.getStep();
+                int index = f.getName().charAt(4) - '0';
+                loadJMenu.getItem(index).setText("存档" + index + "(" + step + "步)");
+                saveJMenu.getItem(index).setText("存档" + index + "(" + step + "步)");
+            }
+        }
     }
 
     //初始化数据
@@ -178,6 +196,8 @@ public class GameJFrame extends JFrame implements KeyListener, ActionListener {
         //将菜单里面的两个选项添加到菜单里面
         jMenuBar.add(functionJMenu);
         jMenuBar.add(aboutJMenu);
+
+        getGameInfo();
 
         //给整个界面设置菜单
         this.setJMenuBar(jMenuBar);
@@ -336,7 +356,8 @@ public class GameJFrame extends JFrame implements KeyListener, ActionListener {
             int index = item.getText().charAt(2) - '0';
             try {
                 ObjectOutputStream oos = new ObjectOutputStream(new FileOutputStream("save\\save" + index + ".data"));
-                IoUtil.writeObj(oos, true, GameInfo.class);
+                GameInfo gi = new GameInfo(data, x, y, path, step);
+                IoUtil.writeObj(oos, true, gi);
             } catch (IOException ex) {
                 throw new RuntimeException(ex);
             }
@@ -345,7 +366,21 @@ public class GameJFrame extends JFrame implements KeyListener, ActionListener {
             loadJMenu.getItem(index).setText("存档" + index + "(" + step + "步)");
         } else if (source == loadItem0 || source == loadItem1 || source == loadItem2 || source == loadItem3 || source == loadItem4) {
             JMenuItem item = (JMenuItem) source;
-            System.out.println(item.getText());
+            int index = item.getText().charAt(2) - '0';
+            GameInfo gi = null;
+            try {
+                ObjectInputStream ois = new ObjectInputStream(new FileInputStream("save\\save" + index + ".data"));
+                gi = (GameInfo) ois.readObject();
+                ois.close();
+            } catch (IOException | ClassNotFoundException ex) {
+                throw new RuntimeException(ex);
+            }
+            data = gi.getData();
+            x = gi.getX();
+            y = gi.getY();
+            path = gi.getPath();
+            step = gi.getStep();
+            initImage();
         }
     }
 
