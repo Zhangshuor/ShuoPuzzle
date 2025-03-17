@@ -12,6 +12,7 @@ import java.awt.event.KeyEvent;
 import java.awt.event.KeyListener;
 import java.io.*;
 import java.util.ArrayList;
+import java.util.Properties;
 import java.util.Random;
 
 public class GameJFrame extends JFrame implements KeyListener, ActionListener {
@@ -328,9 +329,17 @@ public class GameJFrame extends JFrame implements KeyListener, ActionListener {
             JOptionPane.showMessageDialog(this, "你确定要关闭游戏吗？关闭游戏后游戏进度将不被保存");
             System.exit(0);
         } else if (source == myGitHubItem) {
+            Properties prop = new Properties();
+            try {
+                FileInputStream fis = new FileInputStream("game.properties");
+                prop.load(fis);
+                fis.close();
+            } catch (IOException ex) {
+                ex.printStackTrace();
+            }
             // 打开 GitHub 链接
             try {
-                Desktop.getDesktop().browse(new java.net.URI("https://github.com/Zhangshuor"));
+                Desktop.getDesktop().browse(new java.net.URI(prop.getProperty("myGithub")));
             } catch (Exception ex) {
                 ex.printStackTrace();
             }
