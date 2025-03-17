@@ -1,5 +1,6 @@
 package com.suresure.ui;
 
+import cn.hutool.core.io.FileUtil;
 import com.suresure.domain.User;
 import com.suresure.utils.CodeUtil;
 
@@ -8,13 +9,10 @@ import java.awt.event.ActionListener;
 import java.awt.event.MouseEvent;
 import java.awt.event.MouseListener;
 import java.util.ArrayList;
+import java.util.List;
 
 public class LoginJFrame extends JFrame implements MouseListener {
-    static ArrayList<User> allUsers = new ArrayList<>();
-    static {
-        allUsers.add(new User("zhangsan","1234"));
-        allUsers.add(new User("lisi","1234"));
-    }
+    ArrayList<User> allUsers = new ArrayList<>();
     JButton login = new JButton();
     JButton register = new JButton();
 
@@ -23,14 +21,32 @@ public class LoginJFrame extends JFrame implements MouseListener {
     JTextField code = new JTextField();
     //正确的验证码
     JLabel rightCode = new JLabel();
-    
-    
-    
+
+
     public LoginJFrame() {
+        //读取本地文件中的用户信息
+        readUserInfo();
+
+
         initJFrame();
         initView();
         //让当前界面显示出来
         this.setVisible(true);
+    }
+
+    private void readUserInfo() {
+        //读取文件
+        List<String> userInfoStrList = FileUtil.readUtf8Lines("D:\\develop\\code\\javase\\ShuoPuzzle\\userinfo.txt");
+        //遍历集合，获取用户信息，并创建User对象
+        userInfoStrList.forEach(userInfo -> {
+            String[] userInfoArr = userInfo.split("&");
+            //0 username=zhangsan 1 password=123
+            String[] arr1 = userInfoArr[0].split("=");
+            String[] arr2 = userInfoArr[1].split("=");
+            User user = new User(arr1[1], arr2[1]);
+            allUsers.add(user);
+        });
+        System.out.println(allUsers);
     }
 
     private void initView() {
@@ -156,8 +172,6 @@ public class LoginJFrame extends JFrame implements MouseListener {
 
                 //调用showJDialog方法并展示弹框
                 showJDialog("用户名或者密码为空");
-
-
             } else if (!codeInput.equalsIgnoreCase(rightCode.getText())) {
                 showJDialog("验证码输入错误");
             } else if (contains(userInfo)) {
@@ -213,7 +227,7 @@ public class LoginJFrame extends JFrame implements MouseListener {
     }
 
     //判断用户在集合中是否存在
-    public boolean contains(User userInput){
+    public boolean contains(User userInput) {
         for (User rightUser : allUsers) {
             if (userInput.getUsername().equals(rightUser.getUsername()) && userInput.getPassword().equals(rightUser.getPassword())) {
                 //有相同的代表存在，返回true，后面的不需要再比了

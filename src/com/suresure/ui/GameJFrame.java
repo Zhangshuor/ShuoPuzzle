@@ -196,8 +196,8 @@ public class GameJFrame extends JFrame implements KeyListener, ActionListener {
                 data[x][y + 1] = 0;
                 y++;
                 //调用方法，按最新数字加载图片
-                initImage();
                 step++;
+                initImage();
             }
         } else if (keyCode == KeyEvent.VK_UP) {
             if (x < data[x].length - 1) {
@@ -206,8 +206,8 @@ public class GameJFrame extends JFrame implements KeyListener, ActionListener {
                 data[x + 1][y] = 0;
                 x++;
                 //调用方法，按最新数字加载图片
-                initImage();
                 step++;
+                initImage();
             }
         } else if (keyCode == KeyEvent.VK_RIGHT) {
             if (y > 0) {
@@ -216,8 +216,8 @@ public class GameJFrame extends JFrame implements KeyListener, ActionListener {
                 data[x][y - 1] = 0;
                 y--;
                 //调用方法，按最新数字加载图片
-                initImage();
                 step++;
+                initImage();
             }
 
         } else if (keyCode == KeyEvent.VK_DOWN) {
@@ -227,8 +227,8 @@ public class GameJFrame extends JFrame implements KeyListener, ActionListener {
                 data[x - 1][y] = 0;
                 x--;
                 //调用方法，按最新数字加载图片
-                initImage();
                 step++;
+                initImage();
             }
         } else if (keyCode == KeyEvent.VK_V) {
             initImage();
