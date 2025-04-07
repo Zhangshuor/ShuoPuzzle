@@ -11,6 +11,7 @@ import java.awt.event.ActionListener;
 import java.awt.event.KeyEvent;
 import java.awt.event.KeyListener;
 import java.io.*;
+import java.net.URI;
 import java.util.ArrayList;
 import java.util.Properties;
 import java.util.Random;
@@ -70,25 +71,43 @@ public class GameJFrame extends JFrame implements KeyListener, ActionListener {
     }
 
     public void getGameInfo() {
-        File file = new File("save");
-        File[] files = file.listFiles();
-        if (files != null) {
-            for (File f : files) {
-                GameInfo gi = null;
-                try {
-                    ObjectInputStream ois = new ObjectInputStream(new FileInputStream(f));
-                    gi = (GameInfo) ois.readObject();
-                    ois.close();
-                } catch (IOException | ClassNotFoundException e) {
-                    throw new RuntimeException(e);
-                }
+        // 获取项目当前路径
+        String currentDir = System.getProperty("user.dir");
+        File dir = new File(currentDir, "resource/save");
+
+        // 如果目录不存在，就不需要执行了
+        if (!dir.exists() || !dir.isDirectory()) {
+            return;
+        }
+
+        // 获取所有以 .data 结尾的文件
+        File[] files = dir.listFiles((d, name) -> name.toLowerCase().endsWith(".data"));
+        if (files == null) {
+            return;
+        }
+
+        for (File f : files) {
+            String fileName = f.getName();
+            try (InputStream is = new FileInputStream(f);
+                 ObjectInputStream ois = new ObjectInputStream(is)) {
+
+                GameInfo gi = (GameInfo) ois.readObject();
                 int step = gi.getStep();
-                int index = f.getName().charAt(4) - '0';
-                loadJMenu.getItem(index).setText("存档" + index + "(" + step + "步)");
-                saveJMenu.getItem(index).setText("存档" + index + "(" + step + "步)");
+
+                // 文件名格式为 saveX.data，提取 X
+                int index = fileName.charAt(4) - '0';
+
+                // 更新菜单项显示
+                loadJMenu.getItem(index).setText(String.format("存档%d（%d步）", index, step));
+                saveJMenu.getItem(index).setText(String.format("存档%d（%d步）", index, step));
+
+            } catch (IOException | ClassNotFoundException e) {
+                throw new RuntimeException("读取存档失败: " + fileName, e);
             }
         }
     }
+
+
 
     //初始化数据
     private void initData() {
@@ -315,31 +334,25 @@ public class GameJFrame extends JFrame implements KeyListener, ActionListener {
     public void actionPerformed(ActionEvent e) {
         Object source = e.getSource();
         if (source == replayItem) {
-            // 重新游戏：重新初始化数据并刷新界面
             step = 0;
             initData();
             initImage();
         } else if (source == reLoginItem) {
-            // 重新登陆：这里只做提示，可根据需要实现登陆逻辑
             JOptionPane.showMessageDialog(this, "你确定要重新登陆吗？重新登录后游戏进度将不被保存");
             this.setVisible(false);
             new LoginJFrame();
         } else if (source == closeItem) {
-            // 关闭游戏
             JOptionPane.showMessageDialog(this, "你确定要关闭游戏吗？关闭游戏后游戏进度将不被保存");
             System.exit(0);
         } else if (source == myGitHubItem) {
             Properties prop = new Properties();
-            try {
-                FileInputStream fis = new FileInputStream("game.properties");
+            try (InputStream fis = new FileInputStream("game.properties")) {
                 prop.load(fis);
-                fis.close();
             } catch (IOException ex) {
                 ex.printStackTrace();
             }
-            // 打开 GitHub 链接
             try {
-                Desktop.getDesktop().browse(new java.net.URI(prop.getProperty("myGithub")));
+                Desktop.getDesktop().browse(new URI(prop.getProperty("myGithub")));
             } catch (Exception ex) {
                 ex.printStackTrace();
             }
@@ -348,42 +361,69 @@ public class GameJFrame extends JFrame implements KeyListener, ActionListener {
             step = 0;
             initData();
             initImage();
-
         } else if (source == animalItem) {
             path = getPicFolder(CATEGORY_ANIMAL);
             step = 0;
             initData();
             initImage();
-
         } else if (source == sportItem) {
             path = getPicFolder(CATEGORY_SPORT);
             step = 0;
             initData();
             initImage();
-        } else if (source == saveItem0 || source == saveItem1 || source == saveItem2 || source == saveItem3 || source == saveItem4) {
+        } else if (source == saveItem0
+                || source == saveItem1
+                || source == saveItem2
+                || source == saveItem3
+                || source == saveItem4) {
+
             JMenuItem item = (JMenuItem) source;
             int index = item.getText().charAt(2) - '0';
-            try {
-                ObjectOutputStream oos = new ObjectOutputStream(new FileOutputStream("save\\save" + index + ".data"));
+
+            // 获取当前运行目录
+            String currentDir = System.getProperty("user.dir");
+            String saveDirPath = currentDir + File.separator + "resource" + File.separator + "save";
+
+            File saveDir = new File(saveDirPath);
+            if (!saveDir.exists() && !saveDir.mkdirs()) {
+                throw new RuntimeException("无法创建存档目录: " + saveDirPath);
+            }
+
+            File saveFile = new File(saveDir, "save" + index + ".data");
+
+            try (ObjectOutputStream oos = new ObjectOutputStream(new FileOutputStream(saveFile))) {
                 GameInfo gi = new GameInfo(data, x, y, path, step);
                 IoUtil.writeObj(oos, true, gi);
+                item.setText("存档" + index + "(" + step + "步)");
+                loadJMenu.getItem(index).setText("存档" + index + "(" + step + "步)");
             } catch (IOException ex) {
-                throw new RuntimeException(ex);
+                throw new RuntimeException("写入存档失败: " + saveFile.getAbsolutePath(), ex);
             }
-            //修改存档和读档item信息
-            item.setText("存档" + index + "(" + step + "步)");
-            loadJMenu.getItem(index).setText("存档" + index + "(" + step + "步)");
-        } else if (source == loadItem0 || source == loadItem1 || source == loadItem2 || source == loadItem3 || source == loadItem4) {
+
+        } else if (source == loadItem0
+                || source == loadItem1
+                || source == loadItem2
+                || source == loadItem3
+                || source == loadItem4) {
+
             JMenuItem item = (JMenuItem) source;
             int index = item.getText().charAt(2) - '0';
-            GameInfo gi = null;
-            try {
-                ObjectInputStream ois = new ObjectInputStream(new FileInputStream("save\\save" + index + ".data"));
-                gi = (GameInfo) ois.readObject();
-                ois.close();
-            } catch (IOException | ClassNotFoundException ex) {
-                throw new RuntimeException(ex);
+
+            String currentDir = System.getProperty("user.dir");
+            File saveFile = new File(currentDir + File.separator + "resource" + File.separator + "save", "save" + index + ".data");
+
+            if (!saveFile.exists()) {
+                JOptionPane.showMessageDialog(this, "存档文件不存在，无法加载！");
+                return;
             }
+
+            GameInfo gi;
+            try (ObjectInputStream ois = new ObjectInputStream(new FileInputStream(saveFile))) {
+                gi = (GameInfo) ois.readObject();
+            } catch (IOException | ClassNotFoundException ex) {
+                throw new RuntimeException("读取存档失败: " + saveFile.getAbsolutePath(), ex);
+            }
+
             data = gi.getData();
             x = gi.getX();
             y = gi.getY();
@@ -392,6 +432,7 @@ public class GameJFrame extends JFrame implements KeyListener, ActionListener {
             initImage();
         }
     }
+
 
     private String getPicFolder(String category) {
         String rootPath = "image/" + category + "/";

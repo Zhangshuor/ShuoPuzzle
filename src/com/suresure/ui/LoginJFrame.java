@@ -1,6 +1,7 @@
 package com.suresure.ui;
 
 import cn.hutool.core.io.FileUtil;
+import cn.hutool.core.io.IoUtil;
 import com.suresure.domain.User;
 import com.suresure.utils.CodeUtil;
 
@@ -8,6 +9,7 @@ import javax.swing.*;
 import java.awt.event.ActionListener;
 import java.awt.event.MouseEvent;
 import java.awt.event.MouseListener;
+import java.io.InputStream;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -35,8 +37,14 @@ public class LoginJFrame extends JFrame implements MouseListener {
     }
 
     private void readUserInfo() {
-        //读取文件
-        List<String> userInfoStrList = FileUtil.readUtf8Lines("D:\\develop\\code\\javase\\ShuoPuzzle\\userinfo.txt");
+        // 使用类加载器获取资源文件的输入流
+        InputStream inputStream = getClass().getClassLoader().getResourceAsStream("resource/userinfo.txt");
+        if (inputStream == null) {
+            System.err.println("错误：userinfo.txt 文件未找到！");
+            return;
+        }
+        // Hutool 读取输入流并转换为行列表（自动关闭流）
+        List<String> userInfoStrList = IoUtil.readUtf8Lines(inputStream, new ArrayList<>());
         //遍历集合，获取用户信息，并创建User对象
         userInfoStrList.forEach(userInfo -> {
             String[] userInfoArr = userInfo.split("&");

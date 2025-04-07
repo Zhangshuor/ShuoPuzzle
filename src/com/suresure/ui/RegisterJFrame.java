@@ -7,7 +7,11 @@ import javax.swing.*;
 import java.awt.event.ActionListener;
 import java.awt.event.MouseEvent;
 import java.awt.event.MouseListener;
+import java.io.File;
 import java.util.ArrayList;
+import java.util.List;
+import java.util.Objects;
+import java.util.stream.Collectors;
 
 public class RegisterJFrame extends JFrame implements MouseListener {
     ArrayList<User> allUsers;
@@ -50,11 +54,23 @@ public class RegisterJFrame extends JFrame implements MouseListener {
                 showDialog("用户名已经存在，请重新输入...");
                 return;
             }
-            allUsers.add(new User(username.getText(), password.getText()));
-            FileUtil.writeLines(allUsers, "D:\\develop\\code\\javase\\ShuoPuzzle\\userinfo.txt", "UTF-8");
-            showDialog("注册成功");
-            this.setVisible(false);
-            new LoginJFrame();
+            // 注册成功后的处理逻辑
+            try {
+                // 1. 将用户对象转为字符串格式（username=xxx&password=xxx）
+                List<String> userLines = allUsers.stream()
+                        .map(user -> "username=" + user.getUsername() + "&password=" + user.getPassword())
+                        .collect(Collectors.toList());
+                // 2. 获取资源文件路径（自动处理开发/生产环境）
+                String resourcePath = Objects.requireNonNull(getClass().getClassLoader().getResource("")).getPath();
+                File targetFile = new File(resourcePath, "resource/userinfo.txt");
+                // 3. 使用 Hutool 写入文件（自动创建目录）
+                FileUtil.writeLines(userLines, targetFile, "UTF-8");
+                showDialog("注册成功");
+                this.setVisible(false);
+                new LoginJFrame();
+            } catch (Exception ex) {
+                showDialog("保存用户信息失败：" + ex.getMessage());
+            }
         } else if (e.getSource() == reset) {
             //清空三个输入框
             username.setText("");
